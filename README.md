@@ -25,9 +25,9 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 #### Source/Header Files
 
-* Source files should have the `.cpp` suffix ([see amendments](#Amendments)).
+* Source files should have the `.cpp` suffix ([see amendments](#amendments)).
 * Header files should have the `.h` suffix.
-* Header files that contain both definitions **AND** implementation should have `.hpp` extension ([see amendments](#Amendments)).
+* Header files that contain both definitions **AND** implementation should have `.hpp` extension ([see amendments](#amendments)).
 * Header files should be self-contained (compile on their own).
 * Non-header files that are meant for inclusion should end in `.inc` and be used sparingly.
 * All header files should have `#define` guards to prevent multiple inclusion. The format of the symbol name should be `<PROJECT>_<PATH>_<FILE>_H_`.
@@ -83,7 +83,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 ##### Nonmember, Static Member, and Global Functions
 
 * Prefer placing nonmember functions in a namespace.
-* Don't use completely global functions ([see amendments](#Amendments) TODO).
+* Don't use completely global functions ([see amendments](#amendments) TODO).
 * Prefer grouping functions with a namespace instead of using a class as if it were a namespace.
 * Static methods of a class should generally be closely related to instances of the class or the class's static data.
 
@@ -96,7 +96,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 ##### Static and Global Variables
 
 * Variables of class type with `static` storage duration are forbidden!
-* Global Objects are forbidden ([see amendments](#Amendments) TODO)!
+* Global Objects are forbidden ([see amendments](#amendments) TODO)!
 
 #### Variable Names
 ##### Namespace Names
