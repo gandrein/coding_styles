@@ -98,7 +98,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 * Initialize variables in the declaration!
 * Variables needed for `if`, `while` and `for` statements should normally be declared within those statements, so that such variables are confined to those scopes.
-    * There is one caveat: if the variable is an object, its constructor is invoked every time it enters scope and is created, and its destructor is invoked every time it goes out of scope ([see also here](https://google.github.io/styleguide/cppguide.html#Local_Variables)).
+    * There is one caveat: if the variable is an object, the classes' constructor is invoked every time it enters scope and the destructor is invoked every time it goes out of scope. This is generally undesired if the object is expensive to build. For this reason, for own type of objects, the above rule should not be followed. For more details see [this](https://google.github.io/styleguide/cppguide.html#Local_Variables).
 
 ##### Static and Global Variables
 
