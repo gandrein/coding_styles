@@ -23,7 +23,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Intro](#intro)
 * [Source/Header Files](#sourceheader-files)
 * [Classes](#classes)
-* [Functions](#functions)\
+* [Functions](#functions)
 
 #### Intro
 * We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). For clarity, we succinctly describe the style in here. This document will keep the structure of the original document as much as possible. A few exceptions exist as explained in the amendments section below. 
@@ -113,9 +113,9 @@ When available, the prevailing style agreed by the community is used. If a diffe
 #### Classes
 ##### Structs vs. Classes
 
-* Use a `struct` only for passive objects that carry data, everything else is a `class`;
-    * a `struct` should lack any functionality other than access/setting the data members;
-    * in a `struct` the accessing/setting of fields is done by directly accessing the fields (no methods);
+* Use a `struct` only for passive objects that carry data, everything else is a `class`
+    * a `struct` should lack any functionality other than access/setting the data members
+    * in a `struct` the accessing/setting of fields is done by directly accessing the fields (no methods)
     * `struct`'s methods **should not** provide behavior but should only be used to set up the data members, e.g.:
         * constructor, destructor, `Initialize(), Reset(), Validate()`.
 * If in doubt which to use, make it a `class` (typically if more functionality is required, a `class` is more appropriate)
@@ -123,7 +123,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 ##### Constructors
 * Generally avoid doing work in the constructor! (see [Doing work in constructors](https://google.github.io/styleguide/cppguide.html#Doing_Work_in_Constructors), for more details)
-* Avoid virtual method calls in constructors!
+* Constructors should never call virtual functions!
     * If the work calls virtual functions, these calls will not get dispatched to the subclass implementations.
 * Avoid initialization that can fail if you can't signal an error:
     * There is no easy way for constructors to signal errors unless exceptions are used. Exceptions are allowed in our style, ([see amendments](#amendments) TODO)! 
@@ -136,8 +136,8 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 ##### Member Access Control
 * Data members should always be `private`, unless ...
-    * They are static const (and follow the naming convention for constants). 
-    * When using GTest, for technical reasons, data members of text fixtures can be protected. 
+    * They are `static const` (and follow the naming convention for constants).
+    * When using GTest, for technical reasons, data members of text fixtures can be `protected`.
 
 ##### Declaration Order
 * A class definition should usually have the following structure
@@ -208,7 +208,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
     * The specifiers (also) serve as documentation for the developer/reader;
 
 ###### Multiple inheritance
-* Multiple inheritance is allowed only when all `super-classes`, with the possible exception of the first one, are pure interfaces.
+* Multiple inheritance is allowed only when all `super-classes`, with the possible exception of the first one, are pure interfaces!
 
 ##### Interfaces
 * A class is a pure interface if it meets the following requirements:
@@ -227,7 +227,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * Conversely, don't define operator overloads just because other libraries expect them. 
     * E.g. if your type doesn't have a natural ordering, but you want to store it in a `std::set`, use a custom comparator rather than overloading `<`.
 * Do not overload `&&`, `||`, `, (comma)`, or `unary &`. 
-* Do not overload `operator""`, i.e. do not introduce user-defined literals.
+* Do not overload operator `""`, i.e. do not introduce user-defined literals.
 * Define operators only on your own types. 
     * Define the operators in the same headers, .cc files, and namespaces as the types they operate on. 
     * The above optimizes usage and minimizes the risk of multiple definitions. 
