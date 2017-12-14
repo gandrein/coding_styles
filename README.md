@@ -20,6 +20,11 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * ... and read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 
 ### C++
+* [Intro](#intro)
+* [Source/Header Files](#sourceheader-files)
+* [Classes](#classes)
+* [Functions](#functions)
+
 #### Intro
 * We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). For clarity, we succinctly describe the style in here. This document will keep the structure of the original document as much as possible. A few exceptions exist as explained in the amendments section below. 
 
@@ -105,8 +110,144 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * Variables of class type with `static` storage duration are forbidden!
 * Global Objects are forbidden ([see amendments](#amendments) TODO)!
 
+#### Classes
+##### Structs vs. Classes
+
+* Use a `struct` only for passive objects that carry data, everything else is a `class`
+    * a `struct` should lack any functionality other than access/setting the data members
+    * in a `struct` the accessing/setting of fields is done by directly accessing the fields (no methods)
+    * `struct`'s methods **should not** provide behavior but should only be used to set up the data members, e.g.:
+        * constructor, destructor, `Initialize(), Reset(), Validate()`.
+* If in doubt which to use, make it a `class` (typically if more functionality is required, a `class` is more appropriate)
+* For naming differences between `class` and `struct`, see [Naming Rules](#naming-rules).
+
+##### Constructors
+* Generally avoid doing work in the constructor! (see [Doing work in constructors](https://google.github.io/styleguide/cppguide.html#Doing_Work_in_Constructors), for more details)
+* Constructors should never call virtual functions!
+    * If the work calls virtual functions, these calls will not get dispatched to the subclass implementations.
+* Avoid initialization that can fail if you can't signal an error:
+    * There is no easy way for constructors to signal errors unless exceptions are used. Exceptions are allowed in our style, ([see amendments](#amendments) TODO)! 
+* Exception: if work has to be carried out in the constructor:
+    * Consider the Factory Functions (`Factory Pattern`) or `Init()` methods. (#TODO) 
+    * Avoid `Init()` methods on objects with no other states that affect which public methods may be called (semi-constructed objects of this form are particularly hard to work with correctly).
+
+##### Destructors
+*  If the class has virtual methods, its destructor must be virtual.
+
+##### Member Access Control
+* Data members should always be `private`, unless ...
+    * They are `static const` (and follow the naming convention for constants).
+    * When using GTest, for technical reasons, data members of text fixtures can be `protected`.
+
+##### Declaration Order
+* A class definition should usually have the following structure
+    ```
+    public:
+        <code>
+    protected:
+        <code>
+    private:
+        <code>    
+    ```
+* Within each section:
+    * prefer grouping similar kinds of declarations together
+    * (generally) prefer the following order: 
+        * types (including typedef, using directives, and nested structs and classes)
+        * constants
+        * factory functions
+        * constructors
+        * assignment operators
+        * destructor
+        * all other methods
+        * data members
+
+* Omit sections that would be empty.
+* Group similar declarations together, placing public parts earliest.
+* Do not put large method definitions inline in the class definition. 
+    * only trivial or performance-critical, and very short, methods may be defined inline.
+
+##### Copyable and Movable Types
+* If you do not want to support copy/move operations on your `type`, explicitly disable the implicitly C++ generated functions by using `= delete` in the `public:` section of the class definition
+* Only allow support for copying and/or moving if these operations are clear and meaningful for the implemented `type`. 
+    * If a copy or move constructor is defined, define the corresponding assignment operator, and vice-versa. 
+    * If the `type` is copyable, do not define move operations unless they are significantly more efficient than the corresponding copy operations. 
+    * If the `type` is not copyable, but the correctness of a move is obvious to users of the `type`, make the `type` move-only by defining both of the move operations.
+    * If your `type` provides copy operations, it is recommended that you design your class so that the default implementation of those operations is correct. 
+    ```
+    class Foo {
+        public:
+         Foo(Foo&& other) : field_(other.field) {}
+         // Bad, defines only move constructor, but not operator=.
+       
+        private:
+         Field field_;
+       };
+    ```
+* Due to the risk of slicing, avoid providing an assignment operator or public copy/move constructor for a class that's intended to be derived from (and avoid deriving from a class with such members). 
+    * If your base class needs to be copyable, provide a public virtual `Clone()` method, and a protected copy constructor that derived classes can use to implement it.
+
+##### Implicit conversions
+* Do not define implicit conversions! (see [pros and cons](https://google.github.io/styleguide/cppguide.html#Implicit_Conversions))
+    * Type conversion operators and constructors that are callable with a single argument, must be marked  with the `explicit` keyword (since C++11) in the class definition. 
+    * Exception! 
+        * constructors that take a single `std::initializer_list` parameter should omit `explicit` in order to support copy-initialization, e.g.,
+        ```
+        MyType m = {1, 2};
+        ```
+
+##### Inheritance
+* Prefer _Compostion_ to _Inhereitance_, composition is often more appropriate
+* All inheritance should be public, any other inheritance is discouraged
+    * Instead of private inheritance, include an instance of the base class as a member.
+* Limit the use of protected members in general
+    * Allow (limited usage of) protected member functions only to those members that might need to be accessed from subclasses.
+* Explicitly annotate overrides of virtual functions or virtual destructors with an `override` or (less frequently) `final` specifier. 
+    * Use `virtual` keyword is discouraged unless when used for overrides for older (pre-C++11) code
+* For clarity, use exactly one of `override, final, or virtual` when declaring an override
+* A function or destructor marked `override` or `final` that is not an override of a base class virtual function will not compile and will help catch errors; 
+    * The specifiers (also) serve as documentation for the developer/reader;
+
+###### Multiple inheritance
+* Multiple inheritance is allowed only when all `super-classes`, with the possible exception of the first one, are pure interfaces!
+
+##### Interfaces
+* A class is a pure interface if it meets the following requirements:
+    * It has only public pure virtual `("= 0")` methods and static methods (but see below for destructor).
+    * It may not have non-static data members.
+    * It need not have any constructors defined. If a constructor is provided, it must take no arguments and it must be protected.
+    * If it is a subclass, it may only be derived from classes that satisfy these conditions
+    * To make sure all implementations of the interface can be destroyed correctly, the interface must also declare a virtual destructor (in an exception to the first rule, this should not be pure). See _Stroustrup, The C++ Programming Language, 3rd edition, section 12.4 for details_.
+
+
+##### Operator Overloading
+* Define overloaded operators only if their meaning is obvious, unsurprising, and consistent with the corresponding built-in operators. 
+    * E.g., use `|` as a `bitwise-` or `logical-or`, not as a shell-style pipe.
+* Don't go out of your way to avoid defining operator overloads!
+    * E.g. prefer to define `==`, `=`, and `<<`, rather than `Equals()`, `CopyFrom()`, and `PrintTo()`. 
+* Conversely, don't define operator overloads just because other libraries expect them. 
+    * E.g. if your type doesn't have a natural ordering, but you want to store it in a `std::set`, use a custom comparator rather than overloading `<`.
+* Do not overload `&&`, `||`, `, (comma)`, or `unary &`. 
+* Do not overload operator `""`, i.e. do not introduce user-defined literals.
+* Define operators only on your own types. 
+    * Define the operators in the same headers, .cc files, and namespaces as the types they operate on. 
+    * The above optimizes usage and minimizes the risk of multiple definitions. 
+    * Avoid (if possible) defining operators as templates, because they must satisfy this rule for any possible template arguments. 
+* If you define an operator, also define any related operators that make sense, be consistent.
+    * E.g., if `<` is overloaded, overload all the comparison operators, and make sure `<` and `>` never return true for the same arguments.
+* Prefer to define non-modifying binary operators as non-member functions. 
+    * If a binary operator is defined as a class member, implicit conversions will apply to the right-hand argument, but not the left-hand one. 
+    * It will confuse your users if `a < b` compiles but `b < a` doesn't.
+* For type conversion operators see [Implicit conversions](#implicit-conversions) Section. 
+* For conventions on the `=` operator see the [Copyable and Movable Types](#copyable-and-movable-types) Section.
+* For overloading of the `<<` operator for for use with streams, see the [Streams](#streams) Section. (#TODO) 
+* See [Function Overloading](#function-overloading) Section for conventions which apply to operator overloading as well. (#TODO)
+
+#### Functions
+
+
 #### Variable Names
 ##### Namespace Names
+
 
 #### Amendments
 ##### File naming
