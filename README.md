@@ -244,9 +244,47 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 #### Functions
 
+#### Naming
 
-#### Variable Names
+##### General Naming Rules
+* Names should be descriptive; avoid abbreviation.
+* If abbreviations are used, do not use ones that are ambiguous or unfamiliar to readers outside your project
+* Give as descriptive a name as possible, within reason.
+* Do not abbreviate by deleting letters within a word
+
+##### File Names
+* Filenames should be all lowercase and can include underscores (`_`).
+* See also [Amendments](#Amendments).
+
+##### Type Names
+* Type names start with a capital letter and have a capital letter for each new word, with no underscores.
+* The names of all types — classes, structs, type aliases, enums, and type template parameters — have the same naming convention.
+
+##### Variable Names
+* The names of variables (including function parameters) and data members are all lowercase, with underscores between words.
+* Member variables follow the same rule as above.
+* Data members of structs likewise.
+* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case, e.g. `const int kDaysInAWeek = 7;`
+
+##### Function Names
+
+* Function names should start with a capital letter and have a capital letter for each new word (CamelCase).
+
+
 ##### Namespace Names
+* Namespace names are all lower-case. Top-level namespace names are based on the project name . Avoid collisions between nested namespaces and well-known top-level namespaces.
+* The name of a top-level namespace should usually be the name of the project or team whose code is contained in that namespace.
+* The code in that namespace should usually be in a directory whose basename matches the namespace name (or subdirectories thereof).
+* Avoid nested namespaces that match well-known top-level namespaces, like `std`.
+* For internal namespaces, be wary of other code being added to the same internal namespace causing a collision.
+
+##### Enumerator Names
+
+* Enumerators (for both scoped and unscoped enums) should be named either like constants or like macros: either kEnumName or ENUM_NAME.
+
+##### Macro Names
+
+* You're not really going to define a macro, are you? If you do, they're like this: `MY_MACRO_THAT_SCARES_SMALL_CHILDREN`. So, if they are absolutely needed, then they should be named with all capitals and underscores.
 
 
 #### Amendments
