@@ -24,6 +24,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Source/Header Files](#sourceheader-files)
 * [Classes](#classes)
 * [Functions](#functions)
+* [Naming](#Naming)
 
 #### Intro
 * We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). For clarity, we succinctly describe the style in here. This document will keep the structure of the original document as much as possible. A few exceptions exist as explained in the amendments section below. 
