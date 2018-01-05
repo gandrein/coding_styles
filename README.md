@@ -5,10 +5,10 @@ When available, the prevailing style agreed by the community is used. If a diffe
 ## Table of contents
 
 * [General Rules](#general-rules)
-* [C++](#cpp)
-* [Python](#python)
-* [TCL](#tcl)
-* [Git](#git)
+* [C++ Coding Style](#cpp-coding-style)
+* [Python Coding Style](#python-coding-style)
+* [TCL Coding Style](#tcl-coding-style)
+* [Git Naming Style](#git-naming-style)
 * [References](#references)
 
 ### General rules
@@ -19,15 +19,15 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * Limit lines to 80 characters.
 * ... and read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 
-### C++
+### C++ Coding Style
 * [Intro](#intro)
 * [Source/Header Files](#sourceheader-files)
 * [Classes](#classes)
 * [Functions](#functions)
-* [Naming](#Naming)
+* [Naming](#naming)
 
 #### Intro
-* We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). For clarity, we succinctly describe the style in here. This document will keep the structure of the original document as much as possible. A few exceptions exist as explained in the amendments section below. 
+* We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). This document will keep the structure of the original document as much as possible. For clarity, we succinctly describe the style here. A few exceptions to the official style are considered as explained in the [Amendments section](#amendments). 
 
 #### Source/Header Files
 
@@ -248,40 +248,41 @@ When available, the prevailing style agreed by the community is used. If a diffe
 #### Naming
 
 ##### General Naming Rules
-* Names should be descriptive; avoid abbreviation.
-* If abbreviations are used, do not use ones that are ambiguous or unfamiliar to readers outside your project
-* Give as descriptive a name as possible, within reason.
-* Do not abbreviate by deleting letters within a word
+* Names should be descriptive; avoid abbreviations.
+* If abbreviations are used, do not use ones that are ambiguous or unfamiliar to readers outside your project. _Universally-known_ abbreviations are allowed.
+* Give as descriptive a name as possible, within reason. Think about your next reader, it might be you!
+* Do not abbreviate by deleting letters within a word. 
 
 ##### File Names
 * Filenames should be all lowercase and can include underscores (`_`).
-* See also [Amendments](#Amendments).
+* See also [Amendments](#amendments) for extension conventions and path specific structure.
 
 ##### Type Names
-* Type names start with a capital letter and have a capital letter for each new word, with no underscores.
+* Type names start with a capital letter and have a capital letter for each new word, with no underscores (this is applicable to acronyms as well).
 * The names of all types — classes, structs, type aliases, enums, and type template parameters — have the same naming convention.
 
 ##### Variable Names
-* The names of variables (including function parameters) and data members are all lowercase, with underscores between words.
-* Member variables follow the same rule as above.
-* Data members of structs likewise.
-* Variables declared constexpr or const, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case, e.g. `const int kDaysInAWeek = 7;`
+* The names of variables (including function parameters) and data members are all lowercase, with underscores between words (this is applicable to acronyms as well).
+* Member variables (of classes or structs) follow the same rule as above.
+* Variables declared `constexpr` or `const`, and whose value is fixed for the duration of the program, are named with a leading "k" followed by mixed case, e.g. `const int kDaysInAWeek = 7;`
 
 ##### Function Names
 
-* Function names should start with a capital letter and have a capital letter for each new word (CamelCase).
+* Function names should start with a capital letter and have a capital letter for each new word (CamelCase). No underscores allowed.
+* Capitalize acronyms as single words (i.e. `StartRpc()`, not `StartRPC()`).
 
 
 ##### Namespace Names
-* Namespace names are all lower-case. Top-level namespace names are based on the project name . Avoid collisions between nested namespaces and well-known top-level namespaces.
+* Namespace names are all lower-case. Top-level namespace names are based on the project name. Avoid collisions between nested namespaces and well-known top-level namespaces, like `std`.
+* Choose unique project identifiers e.g. `websearch::index`, `websearch::index_util` over collision-prone names like `websearch::util`.
 * The name of a top-level namespace should usually be the name of the project or team whose code is contained in that namespace.
 * The code in that namespace should usually be in a directory whose basename matches the namespace name (or subdirectories thereof).
-* Avoid nested namespaces that match well-known top-level namespaces, like `std`.
 * For internal namespaces, be wary of other code being added to the same internal namespace causing a collision.
+* Also see the [Scoping - Namespaces Section](#namespaces).
 
 ##### Enumerator Names
 
-* Enumerators (for both scoped and unscoped enums) should be named either like constants or like macros: either kEnumName or ENUM_NAME.
+* Enumerators (for both scoped and unscoped enums) should be named preferably like constants e.g. `kEnumName`. Second accepted version is all caps, like macros i.e., `ENUM_NAME`. However, try to adhere to the first option as much as possible.
 
 ##### Macro Names
 
@@ -306,7 +307,7 @@ Open issues list:
 
 
 
-### Python
+### Python Coding Style
 * Before you start, check [Zen of Python](https://www.python.org/dev/peps/pep-0020/).
 * Follow [PEP8](http://www.python.org/dev/peps/pep-0008/).
 
@@ -314,11 +315,11 @@ Open issues list:
 * Use an editor/IDE that supports a linter with [PEP8](http://www.python.org/dev/peps/pep-0008/) rules in place, e.g. [Sublime-Text](https://www.sublimetext.com/) with [Anaconda](http://damnwidget.github.io/anaconda/)
 * Or use a command line linter that can check [PEP8](http://www.python.org/dev/peps/pep-0008/) rules
 
-### Git
-* TODO
-
-### TCL
+### TCL Coding Style
 * TODO: e.g. follow [this](http://www.cs.columbia.edu/~hgs/etc/tcl-style.txt)
+
+### Git Naming Style
+* TODO
 
 ### References
 
