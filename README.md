@@ -16,8 +16,10 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Don't repeat yourself](http://en.wikipedia.org/wiki/Don't_repeat_yourself).
 * Be consistent!
 * Check [Zen of Python](https://www.python.org/dev/peps/pep-0020/) ...
-* Limit lines to 80 characters.
+* Limit lines to 120 characters. * 
 * ... and read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+
+*[see Amendments section](#amendments).
 
 ### C++ Coding Style
 * [Intro](#intro)
@@ -25,6 +27,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Classes](#classes)
 * [Functions](#functions)
 * [Naming](#naming)
+* [Comments](#comments)
 
 #### Intro
 * We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). This document will keep the structure of the original document as much as possible. For clarity, we succinctly describe the style here. A few exceptions to the official style are considered as explained in the [Amendments section](#amendments). 
@@ -257,7 +260,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
     * Functions should be small
     * Functions Should Do Only One Thing
     * One level of Abstraction per Function
-* Refactor any long and complicated functions when working with some code. Do not be intimidated by modifying existing code!
+* **Refactor** any long and complicated functions when working with some code. Do not be intimidated by modifying existing code!
     > Even if your long function works perfectly now, someone modifying it in a few months may add new behavior. This could result in bugs that are hard to find. Keeping your functions short and simple makes it easier for other people to read and modify your code.
 
 ##### Have No Side Effects (non-Google)
@@ -297,7 +300,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 ##### Type Names
 * Type names start with a capital letter and have a capital letter for each new word, with no underscores (this is applicable to acronyms as well).
-* The names of all types — classes, structs, type aliases, enums, and type template parameters — have the same naming convention.
+* The names of all types — `classes, structs, type aliases, enums`, and type template parameters — have the same naming convention.
 
 ##### Variable Names
 * The names of variables (including function parameters) and data members are all lowercase, with underscores between words (this is applicable to acronyms as well).
@@ -326,6 +329,76 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 * You're not really going to define a macro, are you? If you do, they're like this: `MY_MACRO_THAT_SCARES_SMALL_CHILDREN`. So, if they are absolutely needed, then they should be named with all capitals and underscores.
 
+#### Comments
+
+**Remember**: while comments _may be_ very important, the **best code** is self-documenting (see [amendments](#comments_1) for the more on this). Giving sensible names to types and variables is much better than using obscure names that you must then explain through comments.
+
+If you still decide to write comments, the following rules describe what you should comment and where. When writing your comments, make sure you write for your audience: the next contributor who will need to understand your code. Be generous — the next one may be you! 
+
+##### Comment Style
+Use `/* */` syntax, as most static code analysis tools, like for MISRA C, allow only this style.
+
+##### File Comments
+* Start each file with license boilerplate. Choose the appropriate boilerplate for the license used by the project (for example, Apache 2.0, BSD, LGPL, GPL).
+* File comments describe the contents of a file.
+  * If a file declares, implements, or tests exactly one abstraction that is documented by a comment at the point of declaration, file comments are not required.
+* If a `.h` declares multiple abstractions, the file-level comment should broadly describe the contents of the file, and how the abstractions are related.
+* Do not duplicate comments in both the .h and the .cc. Duplicated comments diverge.
+
+##### Class Comments
+* Every non-obvious class declaration should have an accompanying comment that describes what it is for.
+* The class comment should provide the reader with enough information to know how and when to use the class, as well as any additional considerations necessary to correctly use the class.
+    * **Avoid** creating examples of class-usage as it is time consuming, will diverge with time and clutters the code.
+* Comments describing the use of the class should go together with its interface definition.
+* Comments about the class operation and implementation should accompany the implementation of the class's methods.
+
+##### Function Comments
+
+* We might have comments on the function declaration (e.g. on the `.h` file) or in the function definition (e.g. on the `.cpp` file) but never in both.
+
+###### Function Declarations
+
+* Almost every function declaration should have comments immediately _preceding it_ that describe what the function does and how to use it.
+  * Omit such comments if the function is simple and obvious!!!
+  * Omit self-evident function comments: such as /\* Constructor \*/ or /\* Destructor \*/
+* Comments should be descriptive ("Opens the file") rather than imperative ("Open the file").
+* Types of things to mention in comments at the function declaration:
+  * What the inputs and outputs are.
+  * For class member functions: whether the object remembers reference arguments beyond the duration of the method call, and whether it will free them or not.
+  * If the function allocates memory that the caller must free.
+  * Whether any of the arguments can be a null pointer.
+  * If there are any performance implications of how a function is used.
+  * If the function is re-entrant. What are its synchronization assumptions?
+* When documenting function overrides, focus on the specifics of the override itself, rather than repeating the comment from the overridden function.
+
+
+###### Function Definitions
+
+If there is anything tricky about how a function does its job, the function definition should have an explanatory comment. 
+* E.g. you might describe any coding tricks you use, give an overview of the steps you go through.
+
+**NOTE:** Rather than using a comment, think if you can have a better implementation.
+
+##### Variable comments
+
+* In general the actual name of the variable should be descriptive enough to give a good idea of what the variable is used for.
+* The purpose of each class data member must be clear. If there are any invariants not clearly expressed by the type and name, they must be commented, e.g. existence and meaning of sentinel values, such as `nullptr` or `-1`.
+* All global variables should have a comment describing what they are! And (if unclear) why it needs to be global.
+
+##### Other comments (scenarios)
+
+* In your implementation you should have comments in tricky, non-obvious, interesting, or important parts of your code.
+* Do not state the obvious! In particular, don't literally describe what code does, unless the behavior is non-obvious to a reader who understands C++ well.
+* Pay attention to punctuation, spelling, and grammar; it is easier to read well-written comments than badly written ones. In many cases, complete sentences are more readable than sentence fragments.
+* Shorter comments, such as comments at the end of a line of code, can sometimes be less formal, but you should be consistent with your style.
+* Use `TODO` comments for code that is temporary, a short-term solution, or good-enough but not perfect.
+  * `TODO`s should include the string `TODO` in all caps, followed by the name, e-mail address, bug ID, or other identifier of the person or issue with the best context about the problem referenced by the `TODO`. E.g. `// TODO(bug 12345): remove the "Last visitors" feature`
+* Mark deprecated interface points with `DEPRECATED` comments. 
+  * The comment goes either before the declaration of the interface or on the same line as the declaration.
+  * After the word `DEPRECATED`, write your name, e-mail address, or other identifier in parentheses.
+  * A deprecation comment must include simple, clear directions for people to fix their call-sites.
+
+
 
 #### Amendments
 ##### File naming
@@ -339,12 +412,25 @@ Open issues list:
 	+ Google way: keep .cpp & .h in the same folder
 - [ ] Google research question: if inline is need for class methods or not?
 
-#### Automatic formatting
-* Use an editor/IDE that supports automatic style formatter, e.g. in QT Creator use the [Beautifer plugin](http://doc.qt.io/qtcreator/creator-beautifier.html) with [Artistic Style](http://astyle.sourceforge.net/astyle.html)
-* Or use an external tool that can check source files, e.g. [Artistic Style](http://astyle.sourceforge.net/astyle.html)
-
-#### Other C/C++ Features
+#### Functions
 * Avoid using `switch` statements. Tolerated only when working with polymorphic objects.
+* Consider changing the function signature to replace a `bool` argument with an `enum` argument. This will make the argument values self-describing.
+* For functions that have several configuration options, consider defining a single class or `struct` to hold all the options, and pass an instance of that.
+* In C++, you can implement a deprecated function as an inline function that calls the new interface point.
+  * New code should not contain calls to deprecated interface points.
+
+#### Comments
+* "_The only truly good comment is the comment you found a way not to write._" [Clean Code, Robert C. Martin](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) 
+    * opt for better coding rather than bad code amended with comments; code changes while comments tend to diverge/degrade with time (comments don't compile :) ). 
+    * Read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) Chapter 4: Comments;
+    * This is also a strong rationale: [Software is the design.](https://www.developerdotstar.com/printable/mag/articles/reeves_design.html)
+* Summary: keep comments to a minimum and don't make it a habit
+
+#### Formatting 
+* We chose to limit line length to 120 characters rather than the standard old-fashioned 80 characters.
+##### Automatic formatting
+* Use an editor/IDE that supports automatic style formatter, e.g. in QT Creator use the [Beautifer plugin](http://doc.qt.io/qtcreator/creator-beautifier.html) with [Artistic Style](http://astyle.sourceforge.net/astyle.html) or [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
+* Or use an external tool that can check source files, e.g. [Artistic Style](http://astyle.sourceforge.net/astyle.html)
 
 
 ### Python Coding Style
