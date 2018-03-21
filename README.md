@@ -5,7 +5,7 @@ When available, the prevailing style agreed by the community is used. If a diffe
 ## Table of contents
 
 * [General Rules](#general-rules)
-* [C++ Coding Style](#cpp-coding-style)
+* [C++ Coding Style](#c-coding-style)
 * [Python Coding Style](#python-coding-style)
 * [TCL Coding Style](#tcl-coding-style)
 * [Git Naming Style](#git-naming-style)
@@ -245,6 +245,44 @@ When available, the prevailing style agreed by the community is used. If a diffe
 
 #### Functions
 
+##### Parameter Ordering
+* When defining a function, parameter order is: inputs, then outputs.
+* Put all input-only parameters before any output parameters. In particular, do not add new parameters to the end of the function just because they are new; place new input-only parameters before the output parameters.
+* Output arguments are harder to understand than input arguments; they should be avoided where possible.
+* Try to limit the number of arguments to a **maximum** of three (Clean Code, Robert C. Martin)
+    > A function should have preferably no arguments (niladic). Otherwise, preferably one (monadic), two is okay (dyadic), three (triadic) should be avoided where possible, and you should never have four or more (polyadic).
+
+##### Write Short Functions
+* Try to adhere to these rules (Clean Code, Robert C. Martin)
+    * Functions should be small
+    * Functions Should Do Only One Thing
+    * One level of Abstraction per Function
+* Refactor any long and complicated functions when working with some code. Do not be intimidated by modifying existing code!
+    > Even if your long function works perfectly now, someone modifying it in a few months may add new behavior. This could result in bugs that are hard to find. Keeping your functions short and simple makes it easier for other people to read and modify your code.
+
+##### Have No Side Effects (non-Google)
+* Avoid passing boolean flags or output arguments to your function (Clean Code, Robert C. Martin)
+    >  Side effects are lies. Your function promises to do one thing, but it also does other hidden things that the name of the function does not imply
+
+##### Reference Arguments
+* All parameters passed by reference must be labeled `const`.
+* There are some instances where using const `T*` is preferable to const `T&` for input parameters. For example:
+  * You want to pass in a null pointer.
+  * The function saves a pointer or reference to the input.
+* Try to limit the above occurrences, since using `const T*` instead communicates to the reader that the input is somehow treated differently. So if you choose `const T*` rather than `const T&`, do so for a concrete reason;
+
+##### Function overloading
+* Use overloaded functions (including constructors) only sparingly!
+* Instead, consider qualifying the name with some information about the arguments, e.g., AppendString(), AppendInt() rather than just Append(). If you are overloading a function to support variable number of arguments of the same type, consider making it take a `std::vector` so that the user can use an initializer list to specify the arguments.
+
+##### Default arguments
+* Default arguments are allowed on non-virtual functions when the default is guaranteed to always have the same value.
+* Prefer overloaded functions if the readability gained with default arguments doesn't outweigh the downsides.
+* Default arguments are banned on virtual functions, where they don't work properly.
+
+##### Trailing Return Type Syntax
+* Use trailing return types only where using the ordinary syntax (leading return types) is impractical or much less readable.
+
 #### Naming
 
 ##### General Naming Rules
@@ -305,6 +343,8 @@ Open issues list:
 * Use an editor/IDE that supports automatic style formatter, e.g. in QT Creator use the [Beautifer plugin](http://doc.qt.io/qtcreator/creator-beautifier.html) with [Artistic Style](http://astyle.sourceforge.net/astyle.html)
 * Or use an external tool that can check source files, e.g. [Artistic Style](http://astyle.sourceforge.net/astyle.html)
 
+#### Other C/C++ Features
+* Avoid using `switch` statements. Tolerated only when working with polymorphic objects.
 
 
 ### Python Coding Style
