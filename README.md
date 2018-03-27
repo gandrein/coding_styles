@@ -16,10 +16,12 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Don't repeat yourself](http://en.wikipedia.org/wiki/Don't_repeat_yourself).
 * Be consistent!
 * Check [Zen of Python](https://www.python.org/dev/peps/pep-0020/) ...
-* Limit lines to 120 characters. * 
+* Limit lines to 120 characters. *
 * ... and read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 
-*[see Amendments section](#amendments).
+*compromise between modern-day screens and old-style rule.
+
+---
 
 ### C++ Coding Style
 * [Intro](#intro)
@@ -28,6 +30,8 @@ When available, the prevailing style agreed by the community is used. If a diffe
 * [Functions](#functions)
 * [Naming](#naming)
 * [Comments](#comments)
+* [Formatting](#formatting)
+* [Amendments](#amendments)
 
 #### Intro
 * We follow the [Google C++ Style](https://google.github.io/styleguide/cppguide.html). This document will keep the structure of the original document as much as possible. For clarity, we succinctly describe the style here. A few exceptions to the official style are considered as explained in the [Amendments section](#amendments). 
@@ -398,6 +402,192 @@ If there is anything tricky about how a function does its job, the function defi
   * After the word `DEPRECATED`, write your name, e-mail address, or other identifier in parentheses.
   * A deprecation comment must include simple, clear directions for people to fix their call-sites.
 
+#### Formatting
+
+Most of the styling can be handled by an auto-formating tool/linter. Therefore, in this section only highlights or some aspects that are not handled by such tools are discussed. Example of such tools that support the Google Style are
+ * [Artistic Style](http://astyle.sourceforge.net/astyle.html) 
+ * [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
+
+Use an IDE that supports automatic style formatting. E.g. with QT Creator use the [Beautifer plugin](http://doc.qt.io/qtcreator/creator-beautifier.html) with [Artistic Style](http://astyle.sourceforge.net/astyle.html) or [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html). Eclipse supports importing of styles via an `.xml` file.
+
+##### Line Length
+\* As opposed to Google Style, we chose to limit the line length to 120 characters rather than the standard old-fashioned 80 characters.
+
+##### Non-ASCII Characters
+Non-ASCII characters should be rare, and must use UTF-8 formatting. See more details on [Google C++ Style](https://google.github.io/styleguide/cppguide.html#Non-ASCII_Characters)
+
+##### Spaces vs Tabs
+Use only spaces, and indent two spaces at a time. Set your editor to emit spaces when you hit the tab key.
+
+##### Lambda Expressions
+* Format parameters and bodies as for any other function, and capture lists like other comma-separated lists.
+* Short lambdas may be written inline as function arguments.
+
+##### Function Declarations and Definitions
+Unused parameters that might not be obvious should comment out the variable name in the function definition:
+```
+class Circle : public Shape {
+ public:
+  void Rotate(double radians) override;
+};
+
+void Circle::Rotate(double /*radians*/) {}
+```
+
+```
+// Bad - if someone wants to implement later, it's not clear what the
+// variable means.
+void Circle::Rotate(double) {}
+```
+##### Function Calls
+* If having multiple arguments in a single line decreases readability due to the complexity or confusing nature of the expressions that make up some arguments, try creating variables that capture those arguments in a descriptive name:
+```
+int my_heuristic = scores[x] * y + bases[x];
+bool result = DoSomething(my_heuristic, x, y, z);
+```
+
+* If there is still a case where one argument is significantly more readable on its own line, then put it on its own line. The decision should be specific to the argument which is made more readable rather than a general policy.
+
+* Sometimes arguments form a structure that is important for readability. In those cases, feel free to format the arguments according to that structure:
+```
+// Transform the widget by a 3x3 matrix.
+my_widget.Transform(x1, x2, x3,
+                    y1, y2, y3,
+                    z1, z2, z3);
+```
+
+##### Braced Initializer List Format
+
+* Format a braced initializer list exactly like you would format a function call in its place.
+* If the braced list follows a name (e.g. a type or variable name), format as if the `{}` were the parentheses of a function call with that name. If there is no name, assume a zero-length name.
+```
+// Examples of braced init list on a single line.
+return {foo, bar};
+functioncall({foo, bar});
+std::pair<int, int> p{foo, bar};
+```
+
+##### Conditionals
+* Short conditionals not allowed
+```
+if (x == kFoo) return new Foo();
+
+if (condition)
+  DoSomething();  // 2 space indent.
+```
+* Only accepted forms are
+```
+if (condition) {
+  DoSomething();  // 2 space indent.
+}
+
+// Curly braces around both IF and ELSE required because
+// one of the clauses used braces.
+if (condition) {
+  foo;
+} else {
+  bar;
+}
+```
+
+##### Loops and Switch Statements
+* Fall-through from one case label to another must be annotated using the `ABSL_FALLTHROUGH_INTENDED`; macro (defined in `absl/base/macros.h`). `ABSL_FALLTHROUGH_INTENDED`; should be placed at a point of execution where a fall-through to the next case label occurs. A common exception is consecutive case labels without intervening code, in which case no annotation is needed.
+```
+switch (x) {
+  case 41:  // No annotation needed here.
+  case 43:
+    if (dont_be_picky) {
+      // Use this instead of or along with annotations in comments.
+      ABSL_FALLTHROUGH_INTENDED;
+    } else {
+      CloseButNoCigar();
+      break;
+    }
+  case 42:
+    DoSomethingSpecial();
+    ABSL_FALLTHROUGH_INTENDED;
+  default:
+    DoSomethingGeneric();
+    break;
+}
+```
+* Single-statement loops must use braces!
+```
+for (int i = 0; i < kSomeNumber; ++i) {
+  printf("I take it back\n");
+}
+
+```
+* Empty loop bodies should use either an empty pair of braces or continue with no braces, rather than a single semicolon.
+```
+while (condition) {
+  // Repeat test until it returns false.
+}
+for (int i = 0; i < kSomeNumber; ++i) {}  // Good - one newline is also OK.
+while (condition) continue;  // Good - continue indicates no logic.
+
+while (condition);  // Bad! - looks like part of do/while loop.
+```
+
+##### Pointer and Reference Expressions
+* When declaring a pointer variable or argument, you may place the asterisk adjacent to either the type or to the variable name;
+* It is allowed (if unusual) to declare multiple variables in the same declaration; 
+* It is **disallowed** if any of the variables have pointer or reference decorations. Such declarations are easily misread. 
+```
+int x, *y;  // Disallowed - no & or * in multiple declaration
+char * c;  // Bad - spaces on both sides of *
+const string & str;  // Bad - spaces on both sides of &
+```
+
+##### Variable and Array Initialization
+* Your choice of `=`, `()`, or `{}`.
+* Be careful when using a braced initialization list `{...}` on a type with an `std::initializer_list` constructor. A nonempty braced-init-list prefers the `std::initializer_list` constructor whenever possible. Note that empty braces `{}` are special, and will call a default constructor if available. To force the non-`std::initializer_list` constructor, use parentheses instead of braces.
+* The brace form prevents narrowing of integral types. This can prevent some types of programming errors.
+```
+int pi(3.14);  // OK -- pi == 3.
+int pi{3.14};  // Compile error: narrowing conversion.
+```
+
+##### Preprocessor Directives
+* The hash mark that starts a preprocessor directive should always be at the beginning of the line.
+* Even when preprocessor directives are within the body of indented code, the directives should start at the beginning of the line.
+```
+// Good - directives at beginning of line
+  if (lopsided_score) {
+#if DISASTER_PENDING      // Correct -- Starts at beginning of line
+    DropEverything();
+# if NOTIFY               // OK but not required -- Spaces after #
+    NotifyClient();
+# endif
+#endif
+    BackToNormal();
+  }
+```
+
+##### Class Format
+* The `public:`, `protected:`, and `private:` keywords should be indented one space.
+* Except for the first instance, these keywords should be preceded by a blank line. This rule is optional in small classes.
+
+##### Namespace Formatting
+* The contents of namespaces are not indented
+* Namespaces do not add an extra level of indentation
+* When declaring nested namespaces, put each namespace on its own line
+
+##### Horizontal Whitespace
+* Don't introduce trailing whitespace.
+
+##### Vertical Whitespace
+* Minimize use of vertical whitespace.
+* This is more a principle than a rule: don't use blank lines when you don't have to. In particular:
+    * don't put more than one or two blank lines between functions
+    * resist starting functions with a blank line
+    * don't end functions with a blank line
+    * be discriminating with your use of blank lines inside functions.
+
+* The basic principle is: The more code that fits on one screen, the easier it is to follow and understand the control flow of the program. Of course, readability can suffer from code being too dense as well as too spread out, so use your judgement. But in general, minimize use of vertical whitespace.
+* Some rules of thumb to help when blank lines may be useful:
+    * Blank lines at the beginning or end of a function very rarely help readability.
+    * Blank lines inside a chain of if-else blocks may well help readability.
 
 
 #### Amendments
@@ -406,32 +596,24 @@ If there is anything tricky about how a function does its job, the function defi
 * Header files that contain only definitions should have **.h** extension
 * Header files that contain both definitions **AND** implementation should have **.hpp** extension
 
-Open issues list:
-
-- [ ] Folder structure research: no standard yet? Which one to pick ?
-	+ Google way: keep .cpp & .h in the same folder
-- [ ] Google research question: if inline is need for class methods or not?
-
-#### Functions
+##### Functions
 * Avoid using `switch` statements. Tolerated only when working with polymorphic objects.
 * Consider changing the function signature to replace a `bool` argument with an `enum` argument. This will make the argument values self-describing.
 * For functions that have several configuration options, consider defining a single class or `struct` to hold all the options, and pass an instance of that.
 * In C++, you can implement a deprecated function as an inline function that calls the new interface point.
   * New code should not contain calls to deprecated interface points.
 
-#### Comments
-* "_The only truly good comment is the comment you found a way not to write._" [Clean Code, Robert C. Martin](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) 
+##### Comments
+* "_The only truly good comment is the comment you found a way not to write._" [Clean Code, by Robert C. Martin](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) 
     * opt for better coding rather than bad code amended with comments; code changes while comments tend to diverge/degrade with time (comments don't compile :) ). 
     * Read [Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) Chapter 4: Comments;
     * This is also a strong rationale: [Software is the design.](https://www.developerdotstar.com/printable/mag/articles/reeves_design.html)
 * Summary: keep comments to a minimum and don't make it a habit
 
-#### Formatting 
+##### Formatting 
 * We chose to limit line length to 120 characters rather than the standard old-fashioned 80 characters.
-##### Automatic formatting
-* Use an editor/IDE that supports automatic style formatter, e.g. in QT Creator use the [Beautifer plugin](http://doc.qt.io/qtcreator/creator-beautifier.html) with [Artistic Style](http://astyle.sourceforge.net/astyle.html) or [ClangFormat](https://clang.llvm.org/docs/ClangFormat.html)
-* Or use an external tool that can check source files, e.g. [Artistic Style](http://astyle.sourceforge.net/astyle.html)
 
+---
 
 ### Python Coding Style
 * Before you start, check [Zen of Python](https://www.python.org/dev/peps/pep-0020/).
@@ -441,13 +623,24 @@ Open issues list:
 * Use an editor/IDE that supports a linter with [PEP8](http://www.python.org/dev/peps/pep-0008/) rules in place, e.g. [Sublime-Text](https://www.sublimetext.com/) with [Anaconda](http://damnwidget.github.io/anaconda/)
 * Or use a command line linter that can check [PEP8](http://www.python.org/dev/peps/pep-0008/) rules
 
+---
+
 ### TCL Coding Style
 * TODO: e.g. follow [this](http://www.cs.columbia.edu/~hgs/etc/tcl-style.txt)
+
+---
 
 ### Git Naming Style
 * TODO
 
 ### References
+[1. Clean Code, Robert C. Martin](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+[2. Google C++ Style](https://google.github.io/styleguide/cppguide.html)
+[3. What Is Software Design? By Jack W. Reeves](https://www.developerdotstar.com/printable/mag/articles/reeves_design.html)
+[4. Wikipedia: KISS Principle](https://en.wikipedia.org/wiki/KISS_principle)
+[5. Wikipedia: Don't repeat yourself](http://en.wikipedia.org/wiki/Don't_repeat_yourself)
+[6. Zen of Python](https://www.python.org/dev/peps/pep-0020/)
+[7. PEP8](http://www.python.org/dev/peps/pep-0008/)
 
 ## License
 See [License](LICENSE)
